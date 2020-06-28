@@ -1,16 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace SeekAndArchive
 {
     internal class FindFile
     {
-        private readonly List<string> pathList;
+        private  List<string> pathList;
+        private static int fileLenght;
 
         public FindFile()
         {
             pathList = new List<string>();
+        }
+
+
+        /// <summary>
+        /// Search computer directories
+        /// </summary>
+        /// <param name="directory"></param>
+        /// <param name="file"></param>
+        public void SearchDirectory(string directory, string file)
+        {
+            fileLenght = file.Length;
+            try
+            {
+                foreach (var dir in Directory.GetDirectories(directory))
+                {
+                    SearchFilesInDirectory(dir, file);
+                    SearchDirectory(dir, file);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         /// <summary>
@@ -32,28 +56,6 @@ namespace SeekAndArchive
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error when searching for file: " + ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Search computer directories
-        /// </summary>
-        /// <param name="directory"></param>
-        /// <param name="file"></param>
-        public void SearchDirectory(string directory, string file)
-        {
-            try
-            {
-                foreach (var dir in Directory.GetDirectories(directory))
-                {
-                    SearchFilesInDirectory(dir, file);
-                    SearchDirectory(dir, file);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error when searching for directory: " + ex.Message);
             }
         }
 
@@ -61,9 +63,23 @@ namespace SeekAndArchive
         /// Return list with file paths
         /// </summary>
         /// <returns></returns>
-        public List<string> GetPathList()
+        public List<string> GetFileFullPath()
         {
             return pathList;
+        }
+
+        public void GetFilePath()
+        {
+            List<string> tempList = new List<string>();
+
+            for (int i = 0; i < pathList.Count; i++)
+            {
+                string modifyPath = pathList[i].Substring(0, pathList[i].Length - fileLenght);
+                Console.WriteLine(modifyPath);
+                tempList.Add(modifyPath);
+            }
+
+            pathList = tempList;
         }
     }
 }
